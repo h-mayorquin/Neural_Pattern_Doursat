@@ -45,4 +45,4 @@ for t in range(Nt):
             grid[i][j].EvolveVoltage(dt)
         
 
-# Visualize the grid         
+   
