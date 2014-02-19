@@ -48,3 +48,5 @@ for i in range(Nt):
         points.set_data(new_x)
     plt.pause(0.5)
 
+# This didn't work 
+
