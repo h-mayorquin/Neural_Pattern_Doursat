@@ -46,7 +46,6 @@ for i in range(Nt):
     else:
         new_x = ax.imshow(V)
         points.set_data(new_x)
-    plt.pause(0.5)
+    time.pause(0.5)
 
-# This didn't work 
 

@@ -67,3 +67,6 @@ for i in range(Nt):
 
     # Reset the voltage
     V[ AP ] = Vre
+    
+    
+# Comentario adheredido    
