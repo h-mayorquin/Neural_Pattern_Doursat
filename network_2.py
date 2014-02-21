@@ -18,13 +18,16 @@ def visualize_network(V):
     plt.colorbar()
     plt.show()
 
-def calculate_index():
-    
+def calculate_index(x):
+    return 0
 def distance(i,j,index):
-     neuron_position = np.array([i,j])
-     squares = (neuron_position - index) ** 2
-     distance = np.sqrt(np.sum(squares, 1))
-     return distance 
+    neuron_position = np.array([i,j])
+    squares = (neuron_position - index) ** 2
+    distance = np.sqrt(np.sum(squares, 1))
+    return distance
+
+def circular_distance(distance, N):
+    return 0 
 
 
 ##########################
@@ -32,14 +35,14 @@ def distance(i,j,index):
 #########################
 
 # Neuron parameters 
-E = 50
+E = 10
 Vth = 0
-Vre = -20
+Vre = -30
 V0  = Vre
 tau = 20
 
 # Network parameters 
-N = 30
+N = 15
 alpha = 2
 beta = 1
 r_alpha = 1
@@ -47,9 +50,8 @@ r_beta = 3
 
 # Time simulation parameters 
 dt = 0.1
-T = 1000
+T = 100
 Nt = int( T / dt)
-print Nt
 
 ##########################
 # Simulation
@@ -85,12 +87,12 @@ for t in range(Nt):
                 # Calculate distance between each neuron and
                 # the neurons that have spiked 
                 dis = distance(i,j,index)
-
+             
                 # For each neuron that spike add the excitatory
                 # and inhibitory effect to the neuron voltage 
-                excitation = alpha * np.sum( dis  < r_alpha))
-                inhibition = beta * np.sum( ( dis < r_beta) & ( r_alpha < dis ))
-                V[i][j] += excitation - inhibition
+                excitation = alpha * np.sum( dis  < r_alpha)
+                inhibition = beta * np.sum( ( dis < r_beta) & ( r_alpha < dis )S
+               # V[i][j] += excitation - inhibition
 
         print 'PRINT TO DEBUG'
         print 'Action potential time', t * dt
