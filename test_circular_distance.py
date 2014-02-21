@@ -13,6 +13,7 @@ def circular_distance(p1, p2, dimension):
             delta = dimension - delta
         total += delta ** 2
     return total ** 0.5
+
 N = 4
 print 'Espace of four units '
 
@@ -32,3 +33,6 @@ p1 = np.array([0,3])
 p2 = np.array([0,0])
 result = circular_distance(p1,p2,N)
 print 'the distance between (0,0) and (0,3) should be 1 =', result 
+
+
+

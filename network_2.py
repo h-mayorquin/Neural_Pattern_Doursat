@@ -20,15 +20,32 @@ def visualize_network(V):
 
 def calculate_index(x):
     return 0
+
 def distance(i,j,index):
     neuron_position = np.array([i,j])
     squares = (neuron_position - index) ** 2
     distance = np.sqrt(np.sum(squares, 1))
     return distance
 
-def circular_distance(distance, N):
-    return 0 
+def distance2(i,j, aux2, dimension):
+    neuron_position = np.array([i,j])
+    distances = np.zeros(len(aux2[0]))
 
+    for k,(a,b) in enumerate(zip(aux2[0],aux2[1])):
+        distances[k] = circular_distance(neuron_position, [a,b],dimension)
+
+    return distances
+
+
+
+def circular_distance(p1, p2, dimension):        
+    total = 0
+    for (x, y) in zip(p1, p2):
+        delta = abs(x - y)
+        if delta > dimension - delta:
+            delta = dimension - delta
+        total += delta ** 2
+    return total ** 0.5
 
 ##########################
 # Parameters 
@@ -42,15 +59,15 @@ V0  = Vre
 tau = 20
 
 # Network parameters 
-N = 15
+N = 5
 alpha = 2
 beta = 1
 r_alpha = 1
-r_beta = 3 
+r_beta = 10
 
 # Time simulation parameters 
 dt = 0.1
-T = 100
+T = 10
 Nt = int( T / dt)
 
 ##########################
@@ -59,9 +76,9 @@ Nt = int( T / dt)
 
 
 # Initialize the network
+V = np.zeros([N,N])
+V[:] = Vre
 V = np.random.rand(N,N) * (Vth - Vre) + Vre
-#V = np.zeros([N,N])
-#V[:] = Vre
 
 # Evolve the network 
 for t in range(Nt):
@@ -81,7 +98,7 @@ for t in range(Nt):
             index2[k][0] = aux2[0][k]
             index2[k][1] = aux2[1][k]
 
-
+            
         for i in range(N):
             for j in range(N):
                 # Calculate distance between each neuron and
@@ -91,8 +108,8 @@ for t in range(Nt):
                 # For each neuron that spike add the excitatory
                 # and inhibitory effect to the neuron voltage 
                 excitation = alpha * np.sum( dis  < r_alpha)
-                inhibition = beta * np.sum( ( dis < r_beta) & ( r_alpha < dis )S
-               # V[i][j] += excitation - inhibition
+                inhibition = beta * np.sum( ( dis < r_beta) & ( r_alpha < dis ))
+                V[i][j] += excitation - inhibition
 
         print 'PRINT TO DEBUG'
         print 'Action potential time', t * dt
