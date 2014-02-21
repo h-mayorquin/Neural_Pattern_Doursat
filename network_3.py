@@ -40,8 +40,6 @@ def distance2(i, j, aux2, dimension):
 
     return distances
 
-
-
 def circular_distance(p1, p2, dimension):        
     total = 0
     for (x, y) in zip(p1, p2):
@@ -78,34 +76,36 @@ Nt = int( T / dt)
 # Simulation
 ##########################
 
-
 # Initialize the network
-V = np.zeros([N,N])
-V[:] = Vre
+#V = np.zeros([N,N])
+#V[:] = Vre
 V = np.random.rand(N,N) * (Vth - Vre) + Vre
 
 Vavg = np.zeros([N,N])
-Vavg2 = np.zeros([N,N])
 
 # Evolve the network 
 for t in range(Nt):
-     # Evolve the voltage 
+    # Evolve the voltage 
     V = V + ( dt / tau ) * (E - V)
+    # Here we calculate the average 
     n = t + 1
     Vavg = ( 1.0 / n ) * ( (n - 1) * Vavg + V )
+
     # Register action potentials 
-    AP = V > Vth
-    NAP = np.sum(AP) # Number of actions potentials 
-    if (NAP > 0):
-        # Store a list with the indexes of spiking neurons
-        aux2 = np.where(AP)
-                  
+    spikes = V > Vth
+    NAP = np.sum(spikes) # Number of actions potentials 
+
+    new_spikes = spikes
+    while (NAP > 0):
+        # Store a list with the indexes of the spiking neurons
+        index = np.where(new_spikes)
+
+        # Here we calculate the spatial effects 
         for i in range(N):
             for j in range(N):
                 # Calculate distance between each neuron and
                 # the neurons that have spiked 
-#                dis = distance(i,j,index)
-                dis = distance2(i,j,aux2,N)
+                dis = distance2(i,j,index,N)
                 
                 # For each neuron that spike add the excitatory
                 # and inhibitory effect to the neuron voltage 
@@ -113,15 +113,16 @@ for t in range(Nt):
                 inhibition = beta * np.sum( ( dis < r_beta) & ( r_alpha < dis ))
                 V[i][j] += excitation - inhibition
 
-        print 'PRINT TO DEBUG'
-        print 'Action potential time', t * dt
-        print 'where', aux2
-        print 'index', index
-        print 'index2', index2
-        print '-------------'
+        # Substract the spikes so far from the new ones 
+        new_spikes = ( V >  Vth) - spikes
+        NAP = np.sum(new_spikes) #count the number of new spikes 
+        spikes = V > Vth #Recalculate total spikes 
 
+        
     # Reset the voltage
-    V[ AP ] = Vre
+    V[ spikes ] = Vre
     
 visualize_network(Vavg)  
+
+
 
