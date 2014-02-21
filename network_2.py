@@ -8,15 +8,23 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import time
 
-def Visualize_distr(V):
-    Vdis = V.reshape(len(V)*len(V))
-    plt.plot(Vdis,'*')
+def visualize_distr(V):
+    Vdist = V.reshape(len(V)*len(V))
+    plt.plot(Vdist,'*')
     plt.show()
 
-def Visualize_network(V):
+def visualize_network(V):
     plt.imshow(V,interpolation = 'Nearest')
     plt.colorbar()
     plt.show()
+
+def calculate_index():
+    
+def distance(i,j,index):
+     neuron_position = np.array([i,j])
+     squares = (neuron_position - index) ** 2
+     distance = np.sqrt(np.sum(squares, 1))
+     return distance 
 
 
 ##########################
@@ -31,7 +39,7 @@ V0  = Vre
 tau = 20
 
 # Network parameters 
-N = 2
+N = 30
 alpha = 2
 beta = 1
 r_alpha = 1
@@ -39,7 +47,7 @@ r_beta = 3
 
 # Time simulation parameters 
 dt = 0.1
-T = 100
+T = 1000
 Nt = int( T / dt)
 print Nt
 
@@ -74,13 +82,17 @@ for t in range(Nt):
 
         for i in range(N):
             for j in range(N):
-                a = np.array([i,j])
-                b = (a - index) ** 2
-                e = np.sqrt(np.sum(b, 1))
-                excitation = alpha * np.sum(( e < r_alpha))
-                inhibition = beta  * np.sum( ( e < r_beta) & ( r_alpha < e ))
+                # Calculate distance between each neuron and
+                # the neurons that have spiked 
+                dis = distance(i,j,index)
+
+                # For each neuron that spike add the excitatory
+                # and inhibitory effect to the neuron voltage 
+                excitation = alpha * np.sum( dis  < r_alpha))
+                inhibition = beta * np.sum( ( dis < r_beta) & ( r_alpha < dis ))
                 V[i][j] += excitation - inhibition
-                
+
+        print 'PRINT TO DEBUG'
         print 'Action potential time', t * dt
         print 'where', aux2
         print 'index', index
@@ -90,4 +102,4 @@ for t in range(Nt):
     # Reset the voltage
     V[ AP ] = Vre
     
-Visualize_network(V)  
+visualize_network(V)  
