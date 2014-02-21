@@ -32,6 +32,10 @@ tau = 20
 
 # Network parameters 
 N = 2
+alpha = 2
+beta = 1
+r_alpha = 1
+r_beta = 3 
 
 # Time simulation parameters 
 dt = 0.1
@@ -43,10 +47,11 @@ print Nt
 # Simulation
 ##########################
 
-V = np.zeros([N,N])
+
 # Initialize the network
-# V = np.random.rand(N,N) * (Vth - Vre) + Vre
-V[:] = Vre
+V = np.random.rand(N,N) * (Vth - Vre) + Vre
+#V = np.zeros([N,N])
+#V[:] = Vre
 
 # Evolve the network 
 for t in range(Nt):
@@ -67,12 +72,15 @@ for t in range(Nt):
             index2[k][1] = aux2[1][k]
 
 
-        i = 0
-        j = 0
-        a = np.array([i,j])
-        b = (a - index) ** 2
-        e = np.sqrt(np.sum(c,1))
-        
+        for i in range(N):
+            for j in range(N):
+                a = np.array([i,j])
+                b = (a - index) ** 2
+                e = np.sqrt(np.sum(b, 1))
+                excitation = alpha * np.sum(( e < r_alpha))
+                inhibition = beta  * np.sum( ( e < r_beta) & ( r_alpha < e ))
+                V[i][j] += excitation - inhibition
+                
         print 'Action potential time', t * dt
         print 'where', aux2
         print 'index', index
@@ -82,6 +90,4 @@ for t in range(Nt):
     # Reset the voltage
     V[ AP ] = Vre
     
-    
-# Comentario adheredido    
-# Segundo comeentario adherido 
+Visualize_network(V)  
