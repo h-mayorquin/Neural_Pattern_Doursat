@@ -48,7 +48,7 @@ print Nt
 V = np.random.rand(N,N) * (Vth - Vre) + Vre
 
 # Evolve the network 
-for i in range(Nt):
+for t in range(Nt):
      # Evolve the voltage 
     V = V + ( dt / tau ) * (E - V)
     # Register action potentials 
@@ -57,9 +57,9 @@ for i in range(Nt):
     if (NAP > 0):
         # Store a list with the indexes of spiking neurons
         aux2 = np.where(AP)
-        index = []
+        index = np.zeros(NAP)
         for k in range(NAP):
-            index.append( [aux2[0][k],aux2[1][k]] )
+            index[k] =  [aux2[0][k],aux2[1][k]] 
             
         print 'Action potential time', i * dt
         print 'index', index
