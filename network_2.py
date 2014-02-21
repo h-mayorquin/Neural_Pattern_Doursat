@@ -18,8 +18,12 @@ def visualize_network(V):
     plt.colorbar()
     plt.show()
 
-def calculate_index(x):
-    return 0
+def calculate_index(aux2):
+      index = []
+      for k in range(N):
+          index.append( [aux2[0][k],aux2[1][k]] )
+
+      return 0
 
 def distance(i,j,index):
     neuron_position = np.array([i,j])
@@ -27,7 +31,7 @@ def distance(i,j,index):
     distance = np.sqrt(np.sum(squares, 1))
     return distance
 
-def distance2(i,j, aux2, dimension):
+def distance2(i, j, aux2, dimension):
     neuron_position = np.array([i,j])
     distances = np.zeros(len(aux2[0]))
 
@@ -59,15 +63,15 @@ V0  = Vre
 tau = 20
 
 # Network parameters 
-N = 5
+N = 30
 alpha = 2
 beta = 1
-r_alpha = 1
-r_beta = 10
+r_alpha = 3
+r_beta = 15
 
 # Time simulation parameters 
 dt = 0.1
-T = 10
+T = 500
 Nt = int( T / dt)
 
 ##########################
@@ -80,31 +84,28 @@ V = np.zeros([N,N])
 V[:] = Vre
 V = np.random.rand(N,N) * (Vth - Vre) + Vre
 
+Vavg = np.zeros([N,N])
+Vavg2 = np.zeros([N,N])
+
 # Evolve the network 
 for t in range(Nt):
      # Evolve the voltage 
     V = V + ( dt / tau ) * (E - V)
+    n = t + 1
+    Vavg = ( 1.0 / n ) * ( (n - 1) * Vavg + V )
     # Register action potentials 
     AP = V > Vth
     NAP = np.sum(AP) # Number of actions potentials 
     if (NAP > 0):
         # Store a list with the indexes of spiking neurons
-        aux2 = np.where(AP)
-        index = []
-        index2 = np.zeros([NAP,2])
-               
-        for k in range(NAP):
-            index.append( [aux2[0][k],aux2[1][k]] )
-            index2[k][0] = aux2[0][k]
-            index2[k][1] = aux2[1][k]
-
-            
+        index = np.where(AP)
+                  
         for i in range(N):
             for j in range(N):
                 # Calculate distance between each neuron and
                 # the neurons that have spiked 
-                dis = distance(i,j,index)
-             
+                dis = distance2(i,j,index,N)
+                
                 # For each neuron that spike add the excitatory
                 # and inhibitory effect to the neuron voltage 
                 excitation = alpha * np.sum( dis  < r_alpha)
@@ -121,4 +122,5 @@ for t in range(Nt):
     # Reset the voltage
     V[ AP ] = Vre
     
-visualize_network(V)  
+visualize_network(Vavg)  
+
