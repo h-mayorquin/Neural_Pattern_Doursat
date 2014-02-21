@@ -43,9 +43,10 @@ print Nt
 # Simulation
 ##########################
 
-
+V = np.zeros([N,N])
 # Initialize the network
-V = np.random.rand(N,N) * (Vth - Vre) + Vre
+# V = np.random.rand(N,N) * (Vth - Vre) + Vre
+V[:] = Vre
 
 # Evolve the network 
 for t in range(Nt):
@@ -57,12 +58,25 @@ for t in range(Nt):
     if (NAP > 0):
         # Store a list with the indexes of spiking neurons
         aux2 = np.where(AP)
-        index = np.zeros(NAP)
+        index = []
+        index2 = np.zeros([NAP,2])
+               
         for k in range(NAP):
-            index[k] =  [aux2[0][k],aux2[1][k]] 
-            
-        print 'Action potential time', i * dt
+            index.append( [aux2[0][k],aux2[1][k]] )
+            index2[k][0] = aux2[0][k]
+            index2[k][1] = aux2[1][k]
+
+
+        i = 0
+        j = 0
+        a = np.array([i,j])
+        b = (a - index) ** 2
+        e = np.sqrt(np.sum(c,1))
+        
+        print 'Action potential time', t * dt
+        print 'where', aux2
         print 'index', index
+        print 'index2', index2
         print '-------------'
 
     # Reset the voltage
