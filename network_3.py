@@ -9,38 +9,41 @@ import matplotlib.animation as animation
 import time
 
 def visualize_distr(V):
+    """
+    Shows the distribuition of voltages
+    """
     Vdist = V.reshape(len(V)*len(V))
     plt.plot(Vdist,'*')
     plt.show()
 
 def visualize_network(V):
+    """
+    Shows a color map of the neuron voltages 
+    """
     plt.imshow(V,interpolation = 'Nearest')
     plt.colorbar()
     plt.show()
 
-def calculate_index(aux2):
-      index = []
-      for k in range(N):
-          index.append( [aux2[0][k],aux2[1][k]] )
-
-      return 0
-
-def distance(i,j,index):
+def distance(i, j, index, dimension):
+    """
+    Given a particular localation an array of other locations
+    it returns an array with the distances from the individual
+    neurons to every element in aux 
+    """
     neuron_position = np.array([i,j])
-    squares = (neuron_position - index) ** 2
-    distance = np.sqrt(np.sum(squares, 1))
-    return distance
+    distances = np.zeros(len(index[0]))
 
-def distance2(i, j, aux2, dimension):
-    neuron_position = np.array([i,j])
-    distances = np.zeros(len(aux2[0]))
-
-    for k,(a,b) in enumerate(zip(aux2[0],aux2[1])):
+    for k,(a,b) in enumerate(zip(index[0],index[1])):
         distances[k] = circular_distance(neuron_position, [a,b],dimension)
 
     return distances
 
 def circular_distance(p1, p2, dimension):        
+    """
+    Euclidean distance with periodic boundary conditions
+    In particular this measures the distance in a a grid
+    with dimension as the number of squres 
+    """
     total = 0
     for (x, y) in zip(p1, p2):
         delta = abs(x - y)
@@ -48,6 +51,18 @@ def circular_distance(p1, p2, dimension):
             delta = dimension - delta
         total += delta ** 2
     return total ** 0.5
+
+def save_text(V,f):
+    """
+    Save text as a file 
+    """
+    V[ spikes ] = Vre
+    for i in range(N):
+        for j in range(N):
+            f.write(str(V[i][j])+'_')
+        f.write('\n')
+
+  
 
 ##########################
 # Parameters 
@@ -61,7 +76,7 @@ V0  = Vre
 tau = 20
 
 # Network parameters 
-N = 30
+N = 10 
 alpha = 2
 beta = 1
 r_alpha = 3
@@ -69,7 +84,7 @@ r_beta = 15
 
 # Time simulation parameters 
 dt = 0.1
-T = 500
+T = 50
 Nt = int( T / dt)
 
 ##########################
@@ -77,11 +92,17 @@ Nt = int( T / dt)
 ##########################
 
 # Initialize the network
+# Homogeneus start 
 #V = np.zeros([N,N])
 #V[:] = Vre
+# Random start 
 V = np.random.rand(N,N) * (Vth - Vre) + Vre
 
+# This will meassure the average voltage 
 Vavg = np.zeros([N,N])
+
+f = open('../data/try.txt','w+')
+
 
 # Evolve the network 
 for t in range(Nt):
@@ -105,7 +126,7 @@ for t in range(Nt):
             for j in range(N):
                 # Calculate distance between each neuron and
                 # the neurons that have spiked 
-                dis = distance2(i,j,index,N)
+                dis = distance(i,j,index,N)
                 
                 # For each neuron that spike add the excitatory
                 # and inhibitory effect to the neuron voltage 
@@ -120,9 +141,7 @@ for t in range(Nt):
 
         
     # Reset the voltage
-    V[ spikes ] = Vre
-    
-visualize_network(Vavg)  
+    save_text(V,f)
 
-
+f.close()
 
