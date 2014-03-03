@@ -10,21 +10,6 @@ import time
 import csv
 import h5py
 
-def visualize_distr(V):
-    """
-    Shows the distribuition of voltages
-    """
-    Vdist = V.reshape(len(V)*len(V))
-    plt.plot(Vdist,'*')
-    plt.show()
-
-def visualize_network(V):
-    """
-    Shows a color map of the neuron voltages 
-    """
-    plt.imshow(V,interpolation = 'Nearest')
-    plt.colorbar()
-    plt.show()
 
 def distance(i, j, index, dimension):
     """
@@ -83,7 +68,7 @@ V0  = Vre
 tau = 20
 
 # Network parameters 
-N = 10
+N = 30
 alpha = 2
 beta = 1
 r_alpha = 3
@@ -91,7 +76,7 @@ r_beta = 15
 
 # Time simulation parameters 
 dt = 0.1
-T = 10
+T = 500
 Nt = int( T / dt)
 
 ##########################
@@ -122,10 +107,6 @@ dset_spikes = f.create_dataset('spikes', shape=(N,N,Nt),dtype=np.bool)
 for t in range(Nt):
     # Evolve the voltage 
     V = V + ( dt / tau ) * (E - V)
-    # Here we calculate the average 
-    n = t + 1
-    Vavg = ( 1.0 / n ) * ( (n - 1) * Vavg + V )
-    # 
     # Register action potentials 
     spikes = V > Vth
     NAP = np.sum(spikes) # Number of actions potentials 
