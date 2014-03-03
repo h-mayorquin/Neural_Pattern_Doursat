@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import time
+import csv
+import h5py
 
 def visualize_distr(V):
     """
@@ -60,8 +62,13 @@ def save_text(V,f):
     for i in range(N):
         for j in range(N):
             f.write(str(V[i][j])+'_')
-        f.write('\n')
+        f.write('\n') #Jump at the end of the column
 
+def save_text_csv(V,mywriter):
+    for row in V:
+        mywriter.writerow(row)
+        mywriter.writerow([])
+   
   
 
 ##########################
@@ -76,7 +83,7 @@ V0  = Vre
 tau = 20
 
 # Network parameters 
-N = 10 
+N = 10
 alpha = 2
 beta = 1
 r_alpha = 3
@@ -84,14 +91,14 @@ r_beta = 15
 
 # Time simulation parameters 
 dt = 0.1
-T = 50
+T = 10
 Nt = int( T / dt)
 
 ##########################
 # Simulation
 ##########################
 
-# Initialize the network
+## Initialize the network
 # Homogeneus start 
 #V = np.zeros([N,N])
 #V[:] = Vre
@@ -101,8 +108,15 @@ V = np.random.rand(N,N) * (Vth - Vre) + Vre
 # This will meassure the average voltage 
 Vavg = np.zeros([N,N])
 
-f = open('../data/try.txt','w+')
+## Open the files to save 
+#f = open('../data/try.txt','w+')
 
+#csv_out = open('../data/csv_try.csv', 'w+')
+#mywriter = csv.writer(csv_out)
+
+f = h5py.File('../data/experiment.hdf5')
+dset_voltage = f.create_dataset('voltage', shape=(N,N,Nt), dtype=np.float32)
+dset_spikes = f.create_dataset('spikes', shape=(N,N,Nt),dtype=np.bool)
 
 # Evolve the network 
 for t in range(Nt):
@@ -111,7 +125,7 @@ for t in range(Nt):
     # Here we calculate the average 
     n = t + 1
     Vavg = ( 1.0 / n ) * ( (n - 1) * Vavg + V )
-
+    # 
     # Register action potentials 
     spikes = V > Vth
     NAP = np.sum(spikes) # Number of actions potentials 
@@ -141,7 +155,14 @@ for t in range(Nt):
 
         
     # Reset the voltage
-    save_text(V,f)
-
-f.close()
+    V[spikes] = Vre
+    
+    # Save the data 
+ #   save_text(V,f)
+    dset_voltage[::,::,t] = V
+    dset_spikes[::,::,t] = spikes  
+    #save_text_csv(V,mywriter)
+f.flush()
+#f.close()
+#csv_out.close()
 
