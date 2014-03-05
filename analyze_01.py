@@ -32,11 +32,11 @@ def visualize_network_V(V):
     plt.show()
 
 
-def visualize_network_rate(V):
+def visualize_network_rate(rate):
     """
     Shows a color map of the neuron voltages 
     """
-    plt.imshow(V)
+    plt.imshow(rate)
     cbar = plt.colorbar()
     cbar.ax.set_ylabel('Firing Rate (Hz)')
     plt.xlabel('Neuron\'s x coordinate')
@@ -65,7 +65,7 @@ T = np.shape(voltage)[2] # Total time
 
 dm = 20 # Time window to the mean rate 
 
-def calculate_mean_rate(spikes,N,T,dm,dt):
+def calculate_mean_rate(spikes, N, T, dm, dt):
 
     T_window = T  - int(dm / dt)
     rate = np.zeros((N,N,T_window))
@@ -75,7 +75,7 @@ def calculate_mean_rate(spikes,N,T,dm,dt):
 
     return rate * 1000 / dt #Transform to Hertz
 
-#rate = calculate_mean_rate(spikes, N, T, dm, dt)
+rate = calculate_mean_rate(spikes, N, T, dm, dt)
 
 ########################
 # Calculate the averages
@@ -91,31 +91,46 @@ def calculate_average(quantity):
 # Animation
 ########################
 
-fig = plt.figure()
+def create_animation_voltage(voltage):
+    #Initiate figure 
+    fig = plt.figure()
+    ims = plt.imshow(voltage[:,:,0])
+    plt.xlabel('Neuron\'s x coordinate')
+    plt.ylabel('Neuron\'s y coordinate')
+    cbar = plt.colorbar()
+    cbar.ax.set_ylabel('Voltage (mV)')
+    plt.clim(-50,0)
 
-#ims = []
-#ims.append((plt.pcolor(x, y, base + add, norm=plt.Normalize(0, 30)),))
-#for i in range(100):
-#    aux = plt.imshow(voltage[:,:,i],interpolation='None')
-#    ims.append( (aux, ) )
+    # Define how wto update frames 
+    def updatefig(i):
+        ims.set_array( voltage[:,:,i] )
+        return ims,
+    # run and save the animation
+    image_animation = animation.FuncAnimation(fig,updatefig, frames=20, interval=1, blit = True)
+    image_animation.save('animationFunction_interval1_fps10_dpi=200.mp4', fps=10, dpi=200)
 
-#image_animation = animation.ArtistAnimation(fig, ims, interval=1)
-#image_animation.save('animation.mp4')
 
-ims = plt.imshow(voltage[:,:,0])
-plt.xlabel('Neuron\'s x coordinate')
-plt.ylabel('Neuron\'s y coordinate')
-cbar = plt.colorbar()
-cbar.ax.set_ylabel('Voltage (mV)')
-plt.clim(-50,0)
+def create_animation_rate(rate):
+    fig = plt.figure()
+    ims = plt.imshow(rate[::,::,1])
+    cbar = plt.colorbar()
+    cbar.ax.set_ylabel('Firing Rate (Hz)')
+    plt.xlabel('Neuron\'s x coordinate')
+    plt.ylabel('Neuron\'s y coordinate')
+    plt.title('Firing rate in a 20 ms window')
+    plt.clim(0,70)
+    
+    # Define how wto update frames 
+    def updatefig(i):
+        ims.set_array( rate[:,:,i] )
+        return ims,
 
-def updatefig(i):
-    ims.set_array( voltage[:,:,i] )
-    return ims,
+    # run and save the animation
+    image_animation = animation.FuncAnimation(fig,updatefig, frames=1000, interval=1, blit = True)
+    image_animation.save('rate__frames=100-fps10_dpi=200.mp4', fps=10, dpi=200)
 
-image_animation = animation.FuncAnimation(fig,updatefig,frames=500, interval=5, blit = True)
 
-image_animation.save('animation_interval5_fps1_dpi=200.mp4',fps=1)
 
+create_animation_rate(rate)
 plt.close()
 #plt.show()
