@@ -49,7 +49,7 @@ rate = calculate_mean_rate(spikes, N, T, dm, dt)
 ########################
 
 Vavg = calculate_average(voltage)
-#rate_avg = calculate_average(rate)
+rate_avg = calculate_average(rate)
 
 ########################
 # Visualize
@@ -64,6 +64,7 @@ date_stamp = '%4d-%02d-%02dT%02d-%02d-%02d' % localtime()[:6]
 filename = directory + date_stamp 
 
 #create_animation_voltage(voltage,frames,interval,fps,dpi,filename)
-create_animation_rate(rate,frames,interval,fps,dpi,filename)
-#visualize_network_V(Vavg)
-
+#create_animation_rate(rate,frames,interval,fps,dpi,filename)
+visualize_network_V(Vavg)
+#visualize_network_both(Vavg, rate_avg)
+visualize_network_rate(rate_avg)
