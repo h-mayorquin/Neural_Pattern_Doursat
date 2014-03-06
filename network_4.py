@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import h5py
 from distance_functions import *
 
+
 def gradient(initial, end, size):
     aux = np.zeros((size,size))
     aux[:,:] = np.linspace(initial,end,size)
@@ -22,26 +23,37 @@ def gausian(mu,sigma,N):
 #########################
 
 # Neuron parameters 
-E = 10
+E = 30
 Vth = 0
 Vre = -50
-V0  = Vre
 tau = 20
 
-# Network parameters 
-N = 10
-alpha = 2
-beta = 1
+#Network parameters 
+# Wave 
+N = 40
+alpha = 0
+beta = 0.10
+r_alpha = 10
+r_beta = 14
 
+# Bumps
+# N = 40
+# alpha = 0
+# beta = 1
+# r_alpha = 6
+# r_beta = 30
 
-beta = gradient(0,1,N)
-r_alpha = 3
-r_beta = 15
 
 # Time simulation parameters 
 dt = 0.1
-T = 10
+T = 250
 Nt = int( T / dt)
+
+# filename
+directory = '../data/'
+date_stamp = '%4d-%02d-%02dT%02d-%02d-%02d' % localtime()[:6]
+title = 'wave'
+filename = directory + date_stamp + title
 
 ##########################
 # Simulation
@@ -55,12 +67,14 @@ Nt = int( T / dt)
 V = np.random.rand(N,N) * (Vth - Vre) + Vre
 
 ## Creates the files to save 
-f = h5py.File('../data/hetero_data.hdf5')
+f = h5py.File(filename)
 dset_voltage = f.create_dataset('voltage', shape=(N,N,Nt), dtype=np.float32)
 dset_spikes = f.create_dataset('spikes', shape=(N,N,Nt),dtype=np.bool)
-dset_spatial
+
+
 # Evolve the network 
 for t in xrange(Nt):
+    print t*dt
     # Evolve the voltage
     V = V + ( dt / tau ) * (E - V)
     # Register action potentials 
