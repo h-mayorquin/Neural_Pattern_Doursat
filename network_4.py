@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import h5py
 from distance_functions import *
-
+from time import localtime
 
 def gradient(initial, end, size):
     aux = np.zeros((size,size))
@@ -29,31 +29,31 @@ Vre = -50
 tau = 20
 
 #Network parameters 
-# Wave 
+## Wave 
 N = 40
 alpha = 0
 beta = 0.10
 r_alpha = 10
-r_beta = 14
+r_beta = 15
 
-# Bumps
+##Bumps
 # N = 40
 # alpha = 0
 # beta = 1
 # r_alpha = 6
 # r_beta = 30
 
-
 # Time simulation parameters 
-dt = 0.1
-T = 250
+dt = 1.0
+T = 1000
 Nt = int( T / dt)
 
 # filename
 directory = '../data/'
 date_stamp = '%4d-%02d-%02dT%02d-%02d-%02d' % localtime()[:6]
-title = 'wave'
-filename = directory + date_stamp + title
+format ='.hdf5'
+title = 'experiment' 
+filename = directory + date_stamp + title + format
 
 ##########################
 # Simulation

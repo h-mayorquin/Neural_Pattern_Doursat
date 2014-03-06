@@ -15,16 +15,16 @@ def visualize_distr(V):
     plt.plot(Vdist,'*')
     plt.show()
 
-def visualize_network_V(V):
+def visualize_network_V(voltage):
     """
     Shows a color map of the neuron voltages 
     """
-    plt.imshow(V)
-    cbar = plt.colorbar()
+    plt.imshow(voltage)
+    cbar = plt.colorbar()    
     cbar.ax.set_ylabel('Voltage (mV)')
     plt.xlabel('Neuron\'s x coordinate')
     plt.ylabel('Neuron\'s y coordinate')
-    plt.title('')
+    plt.title('Voltage')
     #plt.clim(-50,10)
     plt.show()
 
@@ -33,7 +33,7 @@ def visualize_network_rate(rate):
     """
     Shows a color map of the neuron rates 
     """
-    plt.imshow(rate)
+    ims = plt.imshow(rate)
     cbar = plt.colorbar()
     cbar.ax.set_ylabel('Firing Rate (Hz)')
     plt.xlabel('Neuron\'s x coordinate')
@@ -42,6 +42,31 @@ def visualize_network_rate(rate):
     plt.clim(0,70)
     plt.show()
     
+def visualize_network_both(voltage, rate):
+    """
+    Combines visualize_network_rate and visualize_network_v 
+    As subplots
+    """
+    plt.subplot(1,2,1)
+    plt.imshow(rate)
+    cbar = plt.colorbar()
+    cbar.ax.set_ylabel('Firing Rate (Hz)')
+    plt.xlabel('Neuron\'s x coordinate')
+    plt.ylabel('Neuron\'s y coordinate')
+    plt.title('Firing rate in a 20 ms window')
+    plt.clim(0,70)
+
+    plt.subplot(1,2,2)
+    plt.imshow(voltage)
+    cbar = plt.colorbar()
+    cbar.ax.set_ylabel('Voltage (mV)')
+    plt.xlabel('Neuron\'s x coordinate')
+    plt.ylabel('Neuron\'s y coordinate')
+    plt.title('Voltage')
+    #plt.clim(-50,10)
+
+    plt.show()
+
 def create_animation_voltage(voltage, frames=100, interval=1, fps=10, dpi=90, filename='default', format ='.mp4'):
     """
     Documentation needed 
@@ -53,6 +78,7 @@ def create_animation_voltage(voltage, frames=100, interval=1, fps=10, dpi=90, fi
     ims = plt.imshow(voltage[:,:,0])
     plt.xlabel('Neuron\'s x coordinate')
     plt.ylabel('Neuron\'s y coordinate')
+    
     cbar = plt.colorbar()
     cbar.ax.set_ylabel('Voltage (mV)')
     plt.clim(-50,0)
@@ -75,11 +101,12 @@ def create_animation_rate(rate, frames=100, interval=1, fps=10, dpi=90, filename
     # Initiate figure 
     fig = plt.figure()
     ims = plt.imshow(rate[::,::,1])
-    cbar = plt.colorbar()
-    cbar.ax.set_ylabel('Firing Rate (Hz)')
     plt.xlabel('Neuron\'s x coordinate')
     plt.ylabel('Neuron\'s y coordinate')
     plt.title('Firing rate in a 20 ms window')
+
+    cbar = plt.colorbar()
+    cbar.ax.set_ylabel('Firing Rate (Hz)')
     plt.clim(0,70)
     
     # Define how to update frames 

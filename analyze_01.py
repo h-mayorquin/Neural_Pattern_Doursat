@@ -10,6 +10,7 @@ from visualization_functions import *
 from time import localtime
 import h5py
 
+
 # Analysis functions 
 def calculate_mean_rate(spikes, N, T, dm, dt):
 
@@ -28,12 +29,16 @@ def calculate_average(quantity):
 ########################
 # Load the data 
 ########################
-f = h5py.File('../data/bumps_data.hdf5')
+# Data to analyze
+file = '2014-03-06T16-59-38wave'
+format = '.hdf5'
+file = file + format
+f = h5py.File('../data/'+file)
 # f = h5py.File('experiment')
 voltage = f['voltage']
 spikes = f['spikes']
 
-dt = 0.1
+dt = 1.0
 N = np.shape(voltage)[0] # Number of neurons 
 T = np.shape(voltage)[2] # Total time 
 
@@ -55,16 +60,20 @@ rate_avg = calculate_average(rate)
 # Visualize
 ########################
 
+# Animation parameters 
 interval = 1 #Draws a new animation every interval millisecond
-frames = 2300
-fps = 10
-dpi = 90
+frames = int(T / dt) # Shows as many frames as data points 
+fps = int(1 / dt) # One data per second  -multiply this if desired-
+dpi = 90 # Quality 
+
+# Where to save the file 
 directory = '../data/'
 date_stamp = '%4d-%02d-%02dT%02d-%02d-%02d' % localtime()[:6]
 filename = directory + date_stamp 
 
 #create_animation_voltage(voltage,frames,interval,fps,dpi,filename)
-#create_animation_rate(rate,frames,interval,fps,dpi,filename)
+#create_animation_rate(rate,frames - int(dm/dt),interval,fps,dpi,filename)
 visualize_network_V(Vavg)
-#visualize_network_both(Vavg, rate_avg)
 visualize_network_rate(rate_avg)
+#visualize_network_both(Vavg, rate_avg)
+
