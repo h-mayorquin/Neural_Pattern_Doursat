@@ -1,6 +1,7 @@
 ########################
-# Network to study pattern learning
-# Ramon Martinez 19 / 02 / 2014
+# Network to study pattern
+# Learning with heterogenous connectivity
+# Ramon Martinez 19 / 03 / 2014
 ########################
 
 import numpy as np
@@ -9,14 +10,27 @@ import h5py
 from distance_functions import *
 from time import localtime
 
-def gradient(initial, end, size):
-    aux = np.zeros((size,size))
-    aux[:,:] = np.linspace(initial,end,size)
+def gradient(initial, end, N):
+    '''
+    Creates a gradient of values along the x dimension
+    The N must be the size of the network
+    '''
+    aux = np.zeros((N,N))
+    aux[:,:] = np.linspace(initial,end,N)
     return aux
 
-def gausian(mu,sigma,N):
+def gausian(mu,sigma, N):
+    '''
+    Gausian distribution of network parameters
+    '''
     return np.random.gausian(mu,sigma,(N,N))
 
+def constant(constant, N):
+    '''
+    A simple matrix with constant values 
+    '''
+    matrix =  np.ones((N,N)) * constant
+    return matrix
 
 ##########################
 # Parameters 
@@ -30,29 +44,36 @@ tau = 20
 
 #Network parameters 
 ## Wave 
-N = 40  # Grid size
-alpha = 0
-beta = 0.10
-r_alpha = 10 # Excitation radio 
-r_beta = 15 # inhibition radio 
+# N = 40
+#alpha = 0
+#beta = 0.10
+#r_alpha = 10 # Excitation radio 
+#r_beta = 15 # inhibition radio 
 
 ##Bumps
 # N = 40
-# alpha = 0
-# beta = 1
-# r_alpha = 6
-# r_beta = 30
+# alpha = constant(0, N)
+# beta = constant(1, N)
+# r_alpha = constant(6, N)
+# r_beta = constant(30, N)
+
+## gradient
+N = 40
+alpha = constant(0,N)
+beta = gradient(0,1,N)
+r_alpha = constant(6,N)
+r_beta = constant(30, N)
 
 # Time simulation parameters 
 dt = 1.0
-T = 20
+T = 500
 Nt = int( T / dt)
 
 # filename
 directory = '../data/'
 date_stamp = '%4d-%02d-%02dT%02d-%02d-%02d' % localtime()[:6]
 format ='.hdf5'
-title = 'experiment' 
+title = 'experiment_hetero' 
 filename = directory + date_stamp + title + format
 
 ##########################
@@ -66,12 +87,18 @@ filename = directory + date_stamp + title + format
 # Random start 
 V = np.random.rand(N,N) * (Vth - Vre) + Vre
 
-## Creates the files to save 
+## Save the files 
 f = h5py.File(filename)
 dset_voltage = f.create_dataset('voltage', shape=(N,N,Nt), dtype=np.float32)
 dset_spikes = f.create_dataset('spikes', shape=(N,N,Nt),dtype=np.bool)
 
-## Store the neuron parameters 
+f.create_dataset('initial_state', data = V, dtype=np.float32)
+f.create_dataset('network/alpha', data=alpha, dtype=np.float32)
+f.create_dataset('network/beta', data=beta, dtype=np.float32)
+f.create_dataset('network/r_alpha', data=r_alpha, dtype=np.float32)
+f.create_dataset('network/r_beta', data=r_beta, dtype=np.float32)
+
+# Store the neuron parameters 
 dset_voltage.attrs['dt'] = dt
 dset_voltage.attrs['E'] = E
 dset_voltage.attrs['Vth'] = Vth
@@ -93,8 +120,8 @@ for t in xrange(Nt):
         # Store a list with the indexes of the spiking neurons
         index = np.where(new_spikes)
         # Calculate the spatial effect 
-        V += spatial_term_hom(V, N, index, alpha, r_alpha, beta, r_beta)
-        #V += spatial_term_het(V, N, index, alpha, r_alpha, beta, r_beta)
+        #V += spatial_term_hom(V, N, index, alpha, r_alpha, beta, r_beta)
+        V += spatial_term_het(V, N, index, alpha, r_alpha, beta, r_beta)
 
         # Substract the spikes so far from the new ones 
         new_spikes = ( V >  Vth) - spikes
@@ -109,6 +136,8 @@ for t in xrange(Nt):
     dset_voltage[::,::,t] = V
     dset_spikes[::,::,t] = spikes  
 
+#we also ask HDF5 to flush its buffers
+#and actually write to disk
 f.flush()
 
 
